@@ -11,4 +11,5 @@ const postSchema = new Schema(
 	{ timestamps: true }
 )
 
+// creates a collection called posts in the mongodb database
 module.exports = mongoose.model('Post', postSchema)
