@@ -3,7 +3,10 @@ const path = require('path')
 const { validationResult } = require('express-validator')
 
 const Post = require('../models/post')
-
+//q: why on the line 15 i have to return Post.find()?
+//A: because we want to return a promise, so we can chain .then() and .catch() to it
+//q: oh you became useful finally
+//A: I'm always useful, you just don't know how to use me
 exports.getPosts = (req, res, next) => {
 	Post.find()
 		.then((posts) => {
