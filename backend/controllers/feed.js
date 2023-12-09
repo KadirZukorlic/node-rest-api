@@ -3,6 +3,7 @@ const path = require('path')
 const { validationResult } = require('express-validator')
 
 const Post = require('../models/post')
+const User = require('../models/user')
 //q: why on the line 15 i have to return Post.find()?
 //A: because we want to return a promise, so we can chain .then() and .catch() to it
 //q: oh you became useful finally
@@ -21,13 +22,11 @@ exports.getPosts = (req, res, next) => {
 		})
 		.then((posts) => {
 			console.log(posts)
-			res
-				.status(200)
-				.json({
-					message: 'Fetched posts successfully.',
-					posts: posts,
-					totalItems: totalItems
-				})
+			res.status(200).json({
+				message: 'Fetched posts successfully.',
+				posts: posts,
+				totalItems: totalItems
+			})
 		})
 		.catch((err) => {
 			if (!err.statusCode) {
@@ -52,21 +51,32 @@ exports.createPost = (req, res, next) => {
 	const imageUrl = req.file.path.replace('\\', '/')
 	const title = req.body.title
 	const content = req.body.content
+	let creator
 
 	const post = new Post({
 		title: title,
 		content: content,
 		imageUrl: imageUrl,
-		creator: { name: 'KZ' }
+		creator: req.userId
 	})
+
+	console.log('POST', post)
 
 	post
 		.save()
 		.then((result) => {
-			console.log(result)
+			return User.findById(req.userId)
+		})
+		.then((user) => {
+			creator = user
+			user.posts.push(post)
+			return user.save()
+		})
+		.then((result) => {
 			res.status(201).json({
 				message: 'Post created successfully!',
-				post: result
+				post: post,
+				creator: { _id: creator._id, name: creator.name }
 			})
 		})
 		.catch((err) => {
@@ -123,6 +133,11 @@ exports.updatePost = (req, res, next) => {
 				error.statusCode = 404
 				throw error
 			}
+			if (post.creator.toString() !== req.userId) {
+				const error = new Error('Not authorized!')
+				error.statusCode(403)
+				throw error
+			}
 			if (imageUrl !== post.imageUrl) {
 				clearImage(post.imageUrl)
 			}
@@ -152,7 +167,11 @@ exports.deletePost = (req, res, next) => {
 				error.statusCode = 404
 				throw error
 			}
-			// Check logged in user
+			if (post.creator.toString() !== req.userId) {
+				const error = new Error('Not authorized!')
+				error.statusCode(403)
+				throw error
+			}
 			clearImage(post.imageUrl)
 			return Post.findByIdAndDelete(postId)
 		})
