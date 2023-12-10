@@ -8,32 +8,27 @@ const User = require('../models/user')
 //A: because we want to return a promise, so we can chain .then() and .catch() to it
 //q: oh you became useful finally
 //A: I'm always useful, you just don't know how to use me
-exports.getPosts = (req, res, next) => {
+exports.getPosts = async (req, res, next) => {
 	const currentPage = req.query.page || 1
 	const perPage = 2
-	let totalItems
-	Post.find()
-		.countDocuments()
-		.then((count) => {
-			totalItems = count
-			return Post.find()
-				.skip((currentPage - 1) * perPage)
-				.limit(perPage)
+	// let totalItems
+	try {
+		const totalItems = await Post.find().countDocuments()
+		const posts = await Post.find()
+			.skip((currentPage - 1) * perPage)
+			.limit(perPage)
+
+		res.status(200).json({
+			message: 'Fetched posts successfully.',
+			posts: posts,
+			totalItems: totalItems
 		})
-		.then((posts) => {
-			console.log(posts)
-			res.status(200).json({
-				message: 'Fetched posts successfully.',
-				posts: posts,
-				totalItems: totalItems
-			})
-		})
-		.catch((err) => {
-			if (!err.statusCode) {
-				err.statusCode = 500
-			}
-			next(err)
-		})
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500
+		}
+		next(err)
+	}
 }
 
 exports.createPost = (req, res, next) => {
