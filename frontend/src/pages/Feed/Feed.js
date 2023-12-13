@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react'
+import openSocket from 'socket.io-client'
 
 import Post from '../../components/Feed/Post/Post'
 import Button from '../../components/Button/Button'
@@ -22,7 +23,9 @@ class Feed extends Component {
 	}
 
 	componentDidMount() {
-		fetch('URL')
+		fetch('http://localhost:8080/auth/status', {
+			headers: { Authorization: 'Bearer ' + this.props.token }
+		})
 			.then((res) => {
 				if (res.status !== 200) {
 					throw new Error('Failed to fetch user status.')
@@ -35,6 +38,7 @@ class Feed extends Component {
 			.catch(this.catchError)
 
 		this.loadPosts()
+		openSocket('http://localhost:8080')
 	}
 
 	loadPosts = (direction) => {
