@@ -167,6 +167,7 @@ exports.deletePost = (req, res, next) => {
 	const postId = req.params.postId
 
 	Post.findById(postId)
+		.populate('creator')
 		.then((post) => {
 			if (!post) {
 				const error = new Error('Could not find post.')
@@ -189,7 +190,7 @@ exports.deletePost = (req, res, next) => {
 			return user.save()
 		})
 		.then((result) => {
-			console.log('Deleted post.')
+			io.getIO().emit('posts', { action: 'delete', post: postId })
 			res.status(200).json({ message: 'Deleted post.' })
 		})
 		.catch((err) => {
