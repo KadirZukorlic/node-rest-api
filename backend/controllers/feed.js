@@ -2,12 +2,15 @@ const fs = require('fs')
 const path = require('path')
 const { validationResult } = require('express-validator')
 
+const io = require('../socket')
 const Post = require('../models/post')
 const User = require('../models/user')
+
 //q: why on the line 15 i have to return Post.find()?
 //A: because we want to return a promise, so we can chain .then() and .catch() to it
 //q: oh you became useful finally
 //A: I'm always useful, you just don't know how to use me
+
 exports.getPosts = async (req, res, next) => {
 	const currentPage = req.query.page || 1
 	const perPage = 2
@@ -55,8 +58,6 @@ exports.createPost = (req, res, next) => {
 		creator: req.userId
 	})
 
-	console.log('POST', post)
-
 	post
 		.save()
 		.then((result) => {
@@ -68,6 +69,10 @@ exports.createPost = (req, res, next) => {
 			return user.save()
 		})
 		.then((result) => {
+			io.getIO().emit('posts', {
+				action: 'create',
+				post: post
+			})
 			res.status(201).json({
 				message: 'Post created successfully!',
 				post: post,
