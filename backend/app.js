@@ -59,6 +59,7 @@ app.use((error, req, res, next) => {
 	res.status(status).json({ message: message, data: data })
 })
 
+// TODO: fix socket has CORS error
 mongoose
 	.connect(process.env.MONGODB_CONNECT_URI)
 	.then(() => {
