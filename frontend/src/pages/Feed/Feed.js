@@ -217,12 +217,12 @@ class Feed extends Component {
 					resDataField = 'updatePost'
 				}
 				const post = {
-					_id: resData.data.resDataField._id,
-					title: resData.data.resDataField.title,
-					content: resData.data.resDataField.content,
-					creator: resData.data.resDataField.creator,
-					createdAt: resData.data.resDataField.createdAt,
-					imagePath: resData.data.resDataField.imageUrl
+					_id: resData.data[resDataField]._id,
+					title: resData.data[resDataField].title,
+					content: resData.data[resDataField].content,
+					creator: resData.data[resDataField].creator,
+					createdAt: resData.data[resDataField].createdAt,
+					imagePath: resData.data[resDataField].imageUrl
 				}
 				this.setState((prevState) => {
 					let updatedPosts = [...prevState.posts]
