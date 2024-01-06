@@ -212,13 +212,17 @@ class Feed extends Component {
 				if (resData.errors) {
 					throw new Error('User creation failed!')
 				}
+				let resDataField = 'createPost'
+				if (this.state.editPost) {
+					resDataField = 'updatePost'
+				}
 				const post = {
-					_id: resData.data.createPost._id,
-					title: resData.data.createPost.title,
-					content: resData.data.createPost.content,
-					creator: resData.data.createPost.creator,
-					createdAt: resData.data.createPost.createdAt,
-					imagePath: resData.data.createPost.imageUrl
+					_id: resData.data.resDataField._id,
+					title: resData.data.resDataField.title,
+					content: resData.data.resDataField.content,
+					creator: resData.data.resDataField.creator,
+					createdAt: resData.data.resDataField.createdAt,
+					imagePath: resData.data.resDataField.imageUrl
 				}
 				this.setState((prevState) => {
 					let updatedPosts = [...prevState.posts]
