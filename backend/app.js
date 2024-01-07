@@ -1,6 +1,5 @@
 require('dotenv').config()
 const path = require('path')
-const fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 
 const express = require('express')
@@ -12,6 +11,7 @@ const { graphqlHTTP } = require('express-graphql')
 const graphqlSchema = require('./graphql/schema')
 const graphqlResolver = require('./graphql/schema')
 const auth = require('./middleware/auth')
+const { clearImage } = require('./util/file')
 
 const app = express()
 
@@ -103,8 +103,3 @@ mongoose
 		app.listen(8080)
 	})
 	.catch((err) => console.log(err))
-
-const clearImage = (filePath) => {
-	filePath = path.join(__dirname, '..', filePath)
-	fs.unlink(filePath, (err) => console.log(err))
-}
